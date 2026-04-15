@@ -11,9 +11,7 @@ from app.core.config import get_settings
 from app.core.dependencies import get_db, get_redis_cache, get_embedding_generator
 
 settings = get_settings()
-TEST_DATABASE_URL = settings.async_database_url.replace(
-    settings.POSTGRES_DB, f"{settings.POSTGRES_DB}_test"
-)
+TEST_DATABASE_URL = settings.async_database_url.replace(settings.POSTGRES_DB, f"{settings.POSTGRES_DB}_test")
 
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
@@ -45,7 +43,6 @@ async def client(db_session: AsyncSession):
 
     async def override_get_embedding_generator():
         from unittest.mock import AsyncMock
-
         mock = AsyncMock()
         mock.generate.return_value = [0.1] * 1536
         return mock

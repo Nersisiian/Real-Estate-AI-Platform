@@ -41,7 +41,7 @@ class PropertyModel(Base):
     year_built = Column(Integer, nullable=True)
     amenities = Column(ARRAY(String), default=[])
     images = Column(ARRAY(String), default=[])
-    metadata = Column(JSON, default={})
+    property_metadata = Column(JSON, default={})
     created_at = Column(DateTime(timezone=True), server_default=text("NOW()"))
     updated_at = Column(
         DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()")

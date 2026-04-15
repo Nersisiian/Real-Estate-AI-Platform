@@ -22,7 +22,7 @@ class PropertyBase(BaseModel):
     year_built: Optional[int] = None
     amenities: List[str] = Field(default_factory=list)
     images: List[str] = Field(default_factory=list)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    property_metadata: Dict[str, Any] = Field(default_factory=dict, alias="metadata")
 
 
 class PropertyCreate(PropertyBase):

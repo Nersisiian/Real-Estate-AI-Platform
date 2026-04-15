@@ -1,5 +1,6 @@
+﻿import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-
+import ReactMarkdown from 'react-markdown';
 import { IoSend } from 'react-icons/io5';
 import PropertyCard from './components/PropertyCard';
 import Filters from './components/Filters';
@@ -94,7 +95,7 @@ function App() {
         <div className="flex-1 overflow-y-auto p-4">
           <Filters onSearch={handleSearch} />
           <div className="mt-4 space-y-3">
-            {searchResults.map(property => (
+            {searchResults.map((property: Property) => (
               <PropertyCard key={property.id} property={property} compact />
             ))}
           </div>
@@ -171,4 +172,3 @@ function App() {
 }
 
 export default App;
-

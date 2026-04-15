@@ -1,5 +1,6 @@
-import pytest
+﻿import pytest
 from decimal import Decimal
+
 from app.domain.entities import Property
 from app.application.services.rag_service import ChunkingStrategy, RAGIngestionService
 from app.infrastructure.llm.embeddings import EmbeddingGenerator
@@ -19,7 +20,7 @@ def test_chunking_strategy():
 
 
 @pytest.mark.asyncio
-@pytest.mark.asyncio\nasync def test_rag_ingestion(db_session):
+async def test_rag_ingestion(db_session):
     prop_repo = PropertyRepositoryImpl(db_session)
     emb_repo = EmbeddingRepositoryImpl(db_session)
     emb_gen = EmbeddingGenerator()

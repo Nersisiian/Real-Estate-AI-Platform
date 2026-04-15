@@ -155,7 +155,7 @@ class PropertyRepositoryImpl(PropertyRepository):
             "year_built": entity.year_built,
             "amenities": entity.amenities,
             "images": entity.images,
-            "metadata": entity.metadata,
+            "property_metadata": entity.metadata,
             "created_at": entity.created_at,
             "updated_at": entity.updated_at,
             "is_active": entity.is_active,

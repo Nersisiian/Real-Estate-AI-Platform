@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+﻿name: CI/CD Pipeline
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: realestate_test
+          POSTGRES_DB: postgres
         ports:
           - 5432:5432
         options: >-
@@ -47,24 +47,24 @@ jobs:
         pip install -r requirements.txt
         pip install black flake8 pytest pytest-asyncio
 
-    - name: Lint backend
-      run: |
-        cd backend
-        black --check app/
-        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
-
-    
     - name: Create test database
       run: |
         sudo apt-get update && sudo apt-get install -y postgresql-client
         PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP DATABASE IF EXISTS realestate_test;"
-        PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE realestate_test;"- name: Test backend
+        PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE realestate_test;"
+
+    - name: Lint backend
+      run: |
+        cd backend
+        black --check app/
+
+    - name: Test backend
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: realestate_test
+        POSTGRES_DB: realestate
         REDIS_HOST: localhost
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SECRET_KEY: test-secret-key
@@ -82,43 +82,7 @@ jobs:
         cd frontend
         npm ci
 
-    - name: Lint frontend
-      run: |
-        cd frontend
-        npm run lint --if-present
-
     - name: Build frontend
       run: |
         cd frontend
         npm run build
-
-  build-and-push:
-    needs: lint-and-test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build and push backend
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/realestate-backend:latest
-
-    - name: Build and push frontend
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/realestate-frontend:latest

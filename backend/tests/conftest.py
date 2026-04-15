@@ -18,11 +18,13 @@ TEST_DATABASE_URL = settings.async_database_url.replace(
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
 
 @pytest_asyncio.fixture(scope="function")
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
@@ -31,6 +33,7 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
         await conn.run_sync(Base.metadata.create_all)
     async with TestingSessionLocal() as session:
         yield session
+
 
 @pytest_asyncio.fixture
 async def client(db_session: AsyncSession):
@@ -50,10 +53,7 @@ async def client(db_session: AsyncSession):
     app.dependency_overrides[get_redis_cache] = override_get_cache
     app.dependency_overrides[get_embedding_generator] = override_get_embedding_generator
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()
-"@ | Set-Content backend/tests/conftest.py

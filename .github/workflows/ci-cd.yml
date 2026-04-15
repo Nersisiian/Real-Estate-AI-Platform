@@ -1,4 +1,4 @@
-﻿name: CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -81,7 +81,7 @@ jobs:
     - name: Install frontend dependencies
       run: |
         cd frontend
-        npm ci
+        npm install
 
     - name: Build frontend
       run: |

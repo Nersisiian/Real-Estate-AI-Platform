@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+﻿name: CI/CD Pipeline
 
 on:
   push:
@@ -47,12 +47,13 @@ jobs:
         pip install -r requirements.txt
         pip install black flake8 pytest pytest-asyncio
 
-        - name: Create test database
+    - name: Create test database
       run: |
         sudo apt-get update && sudo apt-get install -y postgresql-client
         PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP DATABASE IF EXISTS realestate_test;"
         PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE realestate_test;"
         PGPASSWORD=postgres psql -h localhost -U postgres -d realestate_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
     - name: Lint backend
       run: |
         cd backend

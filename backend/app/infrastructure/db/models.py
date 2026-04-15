@@ -18,7 +18,7 @@ from sqlalchemy.orm import relationship
 from pgvector.sqlalchemy import Vector
 import uuid
 
-from app.infrastructure.db.database import Base
+from app.core.database import Base
 
 
 class PropertyModel(Base):

@@ -45,7 +45,7 @@ async def create_vector_index_endpoint(
     ingestion_service: RAGIngestionService = Depends(get_rag_ingestion_service),
 ):
     from app.infrastructure.vector_store.pgvector_store import PGVectorStore
-    from app.infrastructure.db.database import AsyncSessionLocal
+    from app.core.database import AsyncSessionLocal
 
     async with AsyncSessionLocal() as session:
         vector_store = PGVectorStore(session)

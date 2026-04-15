@@ -11,7 +11,7 @@ from decimal import Decimal
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.core.config import get_settings
-from app.infrastructure.db.database import AsyncSessionLocal
+from app.core.database import AsyncSessionLocal
 from app.infrastructure.db.repositories_impl import (
     PropertyRepositoryImpl,
     EmbeddingRepositoryImpl,

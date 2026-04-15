@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.infrastructure.db.database import AsyncSessionLocal
+from app.core.database import AsyncSessionLocal
 from scripts.ingest_properties import (
     create_sample_properties,
     ingest_all_properties,

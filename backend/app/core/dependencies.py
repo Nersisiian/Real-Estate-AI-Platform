@@ -3,7 +3,7 @@ from typing import AsyncGenerator, Optional
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.infrastructure.db.database import get_db
+from app.core.database import get_db
 from app.infrastructure.db.repositories_impl import (
     PropertyRepositoryImpl,
     EmbeddingRepositoryImpl,

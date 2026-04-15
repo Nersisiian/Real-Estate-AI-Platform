@@ -2,7 +2,7 @@ import pytest
 import asyncio
 from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
 from app.main import app
 from app.infrastructure.db.models import Base
@@ -12,19 +12,11 @@ from app.core.dependencies import get_db, get_redis_cache, get_embedding_generat
 settings = get_settings()
 TEST_DATABASE_URL = settings.async_database_url.replace(settings.POSTGRES_DB, f"{settings.POSTGRES_DB}_test")
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
 @pytest.fixture(scope="function")
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+async def db_session() -> AsyncSession:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

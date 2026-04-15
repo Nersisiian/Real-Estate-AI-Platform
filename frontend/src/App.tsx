@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
+
 import { IoSend } from 'react-icons/io5';
 import PropertyCard from './components/PropertyCard';
 import Filters from './components/Filters';
@@ -172,3 +171,4 @@ function App() {
 }
 
 export default App;
+

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from redis.asyncio import Redis
 
-from app.infrastructure.db.database import get_db
+from app.core.database import get_db
 from app.infrastructure.llm.openai_client import OpenAIClient
 from app.core.config import get_settings
 from app.core.dependencies import get_openai_client

@@ -1,7 +1,8 @@
 import time
 import logging
+import httpx
 from typing import List, Dict, Any, Optional, AsyncGenerator
-from openai import AsyncOpenAI, AsyncTimeout, RateLimitError, APIError
+from openai import AsyncOpenAI, RateLimitError, APIError
 from tenacity import (
     retry,
     stop_after_attempt,
@@ -35,7 +36,7 @@ class OpenAIClient:
     ):
         self.client = AsyncOpenAI(
             api_key=api_key or settings.OPENAI_API_KEY,
-            timeout=AsyncTimeout(connect=10.0, read=60.0, write=10.0, pool=10.0),
+            timeout=httpx.Timeout(connect=10.0, read=60.0, write=10.0, pool=10.0),
             max_retries=0,
         )
         self.model = model or settings.OPENAI_MODEL

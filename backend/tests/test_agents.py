@@ -5,7 +5,7 @@ from app.infrastructure.agents.tool_agent import ToolAgent
 
 
 @pytest.mark.asyncio
-async def test_planner_agent():
+@pytest.mark.asyncio\nasync def test_planner_agent():
     mock_llm = AsyncMock()
     mock_llm.chat_completion.return_value = (
         '{"search_query": "test", "filters": {}, "tools": [], "reasoning": "test"}'
@@ -16,7 +16,7 @@ async def test_planner_agent():
 
 
 @pytest.mark.asyncio
-async def test_tool_agent_calculate_mortgage():
+@pytest.mark.asyncio\nasync def test_tool_agent_calculate_mortgage():
     agent = ToolAgent(property_repo=MagicMock())
     state = {
         "messages": [{"role": "user", "content": "Mortgage on 400000 with 20% down"}]

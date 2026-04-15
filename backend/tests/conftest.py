@@ -11,6 +11,26 @@ from app.main import app
 from app.infrastructure.db.models import Base
 from app.core.config import get_settings
 from app.core.dependencies import get_db, get_redis_cache, get_embedding_generator
+async def create_test_db():
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_db():
+    asyncio.run(create_test_db())
+    yield
+    """Create test database if it doesn't exist."""
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from sqlalchemy import text
+    settings = get_settings()
+    engine_for_creation = create_async_engine(
+        settings.async_database_url.replace(settings.POSTGRES_DB, "postgres"),
+        echo=False,
+        isolation_level="AUTOCOMMIT"
+    )
+    async with engine_for_creation.connect() as conn:
+        await conn.execute(text(f"DROP DATABASE IF EXISTS {settings.POSTGRES_DB}_test"))
+        await conn.execute(text(f"CREATE DATABASE {settings.POSTGRES_DB}_test"))
+    await engine_for_creation.dispose()
+
 
 settings = get_settings()
 TEST_DATABASE_URL = settings.async_database_url.replace(
@@ -25,6 +45,11 @@ engine_for_creation = create_async_engine(
 
 
 async def create_test_db():
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_db():
+    asyncio.run(create_test_db())
+    yield
     async with engine_for_creation.connect() as conn:
         await conn.execute(text(f"DROP DATABASE IF EXISTS {settings.POSTGRES_DB}_test"))
         await conn.execute(text(f"CREATE DATABASE {settings.POSTGRES_DB}_test"))

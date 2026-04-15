@@ -53,7 +53,12 @@ jobs:
         black --check app/
         flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
 
-    - name: Test backend
+    
+    - name: Create test database
+      run: |
+        sudo apt-get update && sudo apt-get install -y postgresql-client
+        PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "DROP DATABASE IF EXISTS realestate_test;"
+        PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE DATABASE realestate_test;"- name: Test backend
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432

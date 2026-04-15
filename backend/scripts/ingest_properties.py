@@ -12,12 +12,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.core.config import get_settings
 from app.infrastructure.db.database import AsyncSessionLocal
-from app.infrastructure.db.repositories_impl import PropertyRepositoryImpl, EmbeddingRepositoryImpl
+from app.infrastructure.db.repositories_impl import (
+    PropertyRepositoryImpl,
+    EmbeddingRepositoryImpl,
+)
 from app.infrastructure.llm.embeddings import EmbeddingGenerator
 from app.application.services.rag_service import RAGIngestionService, ChunkingStrategy
 from app.domain.entities import Property
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 SAMPLE_PROPERTIES = [
@@ -128,7 +133,9 @@ async def ingest_all_properties():
         prop_repo = PropertyRepositoryImpl(session)
         emb_repo = EmbeddingRepositoryImpl(session)
         emb_gen = EmbeddingGenerator()
-        chunking = ChunkingStrategy(chunk_size=settings.CHUNK_SIZE, chunk_overlap=settings.CHUNK_OVERLAP)
+        chunking = ChunkingStrategy(
+            chunk_size=settings.CHUNK_SIZE, chunk_overlap=settings.CHUNK_OVERLAP
+        )
         ingestion_service = RAGIngestionService(prop_repo, emb_repo, emb_gen, chunking)
         result = await ingestion_service.reindex_all()
         logger.info(f"Ingestion complete: {result}")
@@ -136,6 +143,7 @@ async def ingest_all_properties():
 
 async def create_vector_index():
     from app.infrastructure.vector_store.pgvector_store import PGVectorStore
+
     async with AsyncSessionLocal() as session:
         vector_store = PGVectorStore(session)
         await vector_store.create_vector_index(index_type="ivfflat", lists=100)

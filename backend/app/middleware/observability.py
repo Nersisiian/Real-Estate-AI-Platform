@@ -31,7 +31,7 @@ class RequestTracingMiddleware(BaseHTTPMiddleware):
                 extra={
                     "status_code": 500,
                     "duration_ms": round(duration_ms, 2),
-                }
+                },
             )
             raise
 
@@ -41,7 +41,7 @@ class RequestTracingMiddleware(BaseHTTPMiddleware):
             extra={
                 "status_code": response.status_code,
                 "duration_ms": round(duration_ms, 2),
-            }
+            },
         )
 
         response.headers["X-Request-ID"] = request_id

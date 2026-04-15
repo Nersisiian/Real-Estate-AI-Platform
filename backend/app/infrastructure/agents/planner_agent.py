@@ -59,5 +59,5 @@ Available tools:
                 "search_query": user_content,
                 "filters": {},
                 "tools": [],
-                "reasoning": "Fallback due to parsing error"
+                "reasoning": "Fallback due to parsing error",
             }

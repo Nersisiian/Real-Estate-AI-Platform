@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Evaluation script for RAG retrieval accuracy and response quality."""
+
 import asyncio
 import json
 import sys
@@ -20,6 +21,7 @@ async def evaluate(test_file: str, output_file: str):
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--test-file", required=True)
     parser.add_argument("--output", default="results.json")

@@ -75,7 +75,7 @@ class PGVectorStore:
             .where(
                 score_expr >= min_score,
                 PropertyModel.is_active == True,
-                *property_filters
+                *property_filters,
             )
             .order_by(distance_expr)
             .limit(top_k)
@@ -98,7 +98,9 @@ class PGVectorStore:
             for row in rows
         ]
 
-    async def create_vector_index(self, index_type: str = "ivfflat", lists: int = 100) -> None:
+    async def create_vector_index(
+        self, index_type: str = "ivfflat", lists: int = 100
+    ) -> None:
         check_query = text("""
             SELECT 1 FROM pg_indexes
             WHERE tablename = 'embeddings' AND indexname = 'embeddings_embedding_idx'

@@ -19,7 +19,7 @@ class ChunkingStrategy:
         self.chunk_overlap = chunk_overlap
 
     def chunk_text(self, text: str) -> List[str]:
-        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = re.split(r"(?<=[.!?])\s+", text)
         chunks = []
         current_chunk = []
         current_length = 0
@@ -27,16 +27,18 @@ class ChunkingStrategy:
         for sentence in sentences:
             sentence_len = len(sentence)
             if current_length + sentence_len > self.chunk_size and current_chunk:
-                chunk_text = ' '.join(current_chunk)
+                chunk_text = " ".join(current_chunk)
                 chunks.append(chunk_text)
-                overlap_tokens = ' '.join(current_chunk[-2:]) if len(current_chunk) >= 2 else ''
+                overlap_tokens = (
+                    " ".join(current_chunk[-2:]) if len(current_chunk) >= 2 else ""
+                )
                 current_chunk = [overlap_tokens] if overlap_tokens else []
                 current_length = len(overlap_tokens)
             current_chunk.append(sentence)
             current_length += sentence_len
 
         if current_chunk:
-            chunk_text = ' '.join(current_chunk)
+            chunk_text = " ".join(current_chunk)
             chunks.append(chunk_text)
 
         return chunks
@@ -56,11 +58,15 @@ class ChunkingStrategy:
             parts.append(f"Amenities: {', '.join(property.amenities)}")
         parts.append(f"Description: {property.description}")
         if property.metadata:
-            additional = ', '.join(f"{k}: {v}" for k, v in property.metadata.items() if isinstance(v, (str, int, float)))
+            additional = ", ".join(
+                f"{k}: {v}"
+                for k, v in property.metadata.items()
+                if isinstance(v, (str, int, float))
+            )
             if additional:
                 parts.append(f"Additional Info: {additional}")
 
-        full_text = '\n'.join(parts)
+        full_text = "\n".join(parts)
         return self.chunk_text(full_text)
 
 
@@ -101,10 +107,14 @@ class RAGIngestionService:
             embedding_entities.append(embedding)
 
         await self.embedding_repo.save_batch(embedding_entities)
-        logger.info(f"Ingested property {property.id} with {len(embedding_entities)} chunks")
+        logger.info(
+            f"Ingested property {property.id} with {len(embedding_entities)} chunks"
+        )
         return len(embedding_entities)
 
-    async def ingest_properties_batch(self, properties: List[Property]) -> Dict[UUID, int]:
+    async def ingest_properties_batch(
+        self, properties: List[Property]
+    ) -> Dict[UUID, int]:
         results = {}
         for prop in properties:
             count = await self.ingest_property(prop)
@@ -170,7 +180,9 @@ class RAGRetrievalService:
     ) -> Tuple[List[SearchResult], List[Property]]:
         search_results, properties = await self.retrieve_context(query, top_k, filters)
         if reranker and search_results:
-            search_results = await reranker.rerank(query, search_results, top_n=settings.RERANK_TOP_K)
+            search_results = await reranker.rerank(
+                query, search_results, top_n=settings.RERANK_TOP_K
+            )
             prop_map = {p.id: p for p in properties}
             unique_props = []
             seen = set()

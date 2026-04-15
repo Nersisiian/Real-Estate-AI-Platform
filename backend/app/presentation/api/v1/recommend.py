@@ -31,7 +31,9 @@ async def personalized_recommendations(
     recommend_use_case: RecommendUseCase = Depends(get_recommend_use_case),
 ):
     try:
-        recommendations = await recommend_use_case.personalized_recommend(user_preferences, limit)
+        recommendations = await recommend_use_case.personalized_recommend(
+            user_preferences, limit
+        )
         return [PropertyResponse.model_validate(p) for p in recommendations]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

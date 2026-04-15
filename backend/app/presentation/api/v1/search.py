@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional
 from decimal import Decimal
 
-from app.presentation.schemas.property import SearchRequest, SearchResponse, PropertyResponse
+from app.presentation.schemas.property import (
+    SearchRequest,
+    SearchResponse,
+    PropertyResponse,
+)
 from app.application.services.rag_service import RAGRetrievalService
 from app.domain.repositories import PropertyRepository
 from app.core.dependencies import get_rag_retrieval_service, get_property_repository
@@ -37,8 +41,16 @@ async def semantic_search(
         if len(properties) < request.top_k and request.filters:
             criteria_props = await property_repo.find_by_criteria(
                 city=request.filters.city,
-                min_price=Decimal(str(request.filters.min_price)) if request.filters.min_price else None,
-                max_price=Decimal(str(request.filters.max_price)) if request.filters.max_price else None,
+                min_price=(
+                    Decimal(str(request.filters.min_price))
+                    if request.filters.min_price
+                    else None
+                ),
+                max_price=(
+                    Decimal(str(request.filters.max_price))
+                    if request.filters.max_price
+                    else None
+                ),
                 min_rooms=request.filters.min_rooms,
                 max_rooms=request.filters.max_rooms,
                 property_type=request.filters.property_type,

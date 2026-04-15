@@ -18,11 +18,14 @@ class CrossEncoderReranker:
             return
         try:
             from sentence_transformers import CrossEncoder
+
             self.model = CrossEncoder(self.model_name)
             self._initialized = True
             logger.info(f"Loaded cross-encoder model: {self.model_name}")
         except ImportError:
-            logger.warning("sentence-transformers not installed. Using fallback score-based reranking.")
+            logger.warning(
+                "sentence-transformers not installed. Using fallback score-based reranking."
+            )
             self.model = None
             self._initialized = True
 
@@ -45,7 +48,7 @@ class CrossEncoderReranker:
         loop = asyncio.get_event_loop()
         scores = await loop.run_in_executor(None, self.model.predict, pairs)
 
-        if hasattr(scores, 'tolist'):
+        if hasattr(scores, "tolist"):
             scores = scores.tolist()
 
         for result, score in zip(results, scores):
@@ -83,7 +86,8 @@ Relevance Score (0-10):"""
                     max_tokens=10,
                 )
                 import re
-                match = re.search(r'\b(\d+(?:\.\d+)?)\b', response)
+
+                match = re.search(r"\b(\d+(?:\.\d+)?)\b", response)
                 if match:
                     score = float(match.group(1)) / 10.0
                 else:

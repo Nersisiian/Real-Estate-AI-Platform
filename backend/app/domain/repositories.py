@@ -80,5 +80,7 @@ class UserSessionRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_messages(self, id: UUID, messages: List[Dict[str, Any]]) -> Optional[UserSession]:
+    async def update_messages(
+        self, id: UUID, messages: List[Dict[str, Any]]
+    ) -> Optional[UserSession]:
         pass

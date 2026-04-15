@@ -12,7 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingGenerator:
-    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None, cache: Optional[RedisCache] = None):
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        model: Optional[str] = None,
+        cache: Optional[RedisCache] = None,
+    ):
         self.client = AsyncOpenAI(api_key=api_key or settings.OPENAI_API_KEY)
         self.model = model or settings.OPENAI_EMBEDDING_MODEL
         self.cache = cache if settings.ENABLE_CACHE else None
@@ -20,7 +25,9 @@ class EmbeddingGenerator:
     def _cache_key(self, text: str) -> str:
         return f"emb:{hashlib.sha256(text.encode()).hexdigest()}"
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10)
+    )
     async def generate(self, text: str) -> List[float]:
         if self.cache:
             cached = await self.cache.get(self._cache_key(text))
@@ -38,7 +45,9 @@ class EmbeddingGenerator:
             logger.error(f"Embedding generation error: {e}")
             raise
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10)
+    )
     async def generate_batch(self, texts: List[str]) -> List[List[float]]:
         embeddings = []
         uncached_texts = []
@@ -58,12 +67,16 @@ class EmbeddingGenerator:
 
         if uncached_texts:
             try:
-                response = await self.client.embeddings.create(model=self.model, input=uncached_texts)
+                response = await self.client.embeddings.create(
+                    model=self.model, input=uncached_texts
+                )
                 for idx, data in zip(uncached_indices, response.data):
                     emb = data.embedding
                     embeddings[idx] = emb
                     if self.cache:
-                        await self.cache.set(self._cache_key(texts[idx]), emb, ttl=86400)
+                        await self.cache.set(
+                            self._cache_key(texts[idx]), emb, ttl=86400
+                        )
             except Exception as e:
                 logger.error(f"Batch embedding error: {e}")
                 raise

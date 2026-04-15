@@ -12,18 +12,22 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         logger.warning(
             f"HTTP exception: {exc.status_code} - {exc.detail}",
-            extra={"path": request.url.path, "status_code": exc.status_code}
+            extra={"path": request.url.path, "status_code": exc.status_code},
         )
         return JSONResponse(
             status_code=exc.status_code,
-            content={"detail": exc.detail, "request_id": getattr(request.state, "request_id", None)},
+            content={
+                "detail": exc.detail,
+                "request_id": getattr(request.state, "request_id", None),
+            },
         )
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ):
         logger.warning(
-            f"Validation error: {exc.errors()}",
-            extra={"path": request.url.path}
+            f"Validation error: {exc.errors()}", extra={"path": request.url.path}
         )
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -39,7 +43,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         logger.error(
             f"Unhandled exception: {str(exc)}",
             exc_info=True,
-            extra={"path": request.url.path}
+            extra={"path": request.url.path},
         )
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

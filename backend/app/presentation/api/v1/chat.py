@@ -25,20 +25,18 @@ async def chat(
 
     if request.stream:
         return StreamingResponse(
-            _stream_generator(request, agent_service),
-            media_type="text/event-stream"
+            _stream_generator(request, agent_service), media_type="text/event-stream"
         )
     else:
         messages = [{"role": m.role, "content": m.content} for m in request.messages]
         result = await agent_service.process_message(
-            messages,
-            str(request.session_id) if request.session_id else None
+            messages, str(request.session_id) if request.session_id else None
         )
         return ChatResponse(
             response=result["final_response"],
             session_id=result.get("session_id"),
             context_used=result.get("retrieved_context", []),
-            tools_used=[t.get("tool") for t in result.get("tool_results", []) if t]
+            tools_used=[t.get("tool") for t in result.get("tool_results", []) if t],
         )
 
 
@@ -48,7 +46,10 @@ async def _stream_generator(request: ChatRequest, agent_service: AgentService):
     try:
         async for event in agent_service.stream_process(messages, session_id):
             for node_name, node_output in event.items():
-                if node_name == "response_generator" and "final_response" in node_output:
+                if (
+                    node_name == "response_generator"
+                    and "final_response" in node_output
+                ):
                     yield f"data: {json.dumps({'content': node_output['final_response'], 'done': False})}\n\n"
                 elif node_name == "planner" and "plan" in node_output:
                     yield f"data: {json.dumps({'step': 'planning', 'plan': node_output['plan']})}\n\n"

@@ -10,7 +10,9 @@ from app.core.dependencies import get_openai_client
 @pytest.mark.asyncio
 async def test_chat_endpoint_mocked_llm(db_session):
     mock_openai = AsyncMock()
-    mock_openai.chat_completion.return_value = "I found several properties matching your criteria."
+    mock_openai.chat_completion.return_value = (
+        "I found several properties matching your criteria."
+    )
     mock_openai.token_counter.count_tokens.return_value = 10
     mock_openai.token_counter.count_messages_tokens.return_value = 50
     mock_openai.token_counter.count_message_tokens.return_value = 20

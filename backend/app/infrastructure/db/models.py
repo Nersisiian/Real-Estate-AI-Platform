@@ -1,6 +1,17 @@
 from sqlalchemy import (
-    Column, String, Numeric, Integer, Float, Boolean, DateTime,
-    Text, JSON, ARRAY, ForeignKey, Index, text
+    Column,
+    String,
+    Numeric,
+    Integer,
+    Float,
+    Boolean,
+    DateTime,
+    Text,
+    JSON,
+    ARRAY,
+    ForeignKey,
+    Index,
+    text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -32,10 +43,14 @@ class PropertyModel(Base):
     images = Column(ARRAY(String), default=[])
     metadata = Column(JSON, default={})
     created_at = Column(DateTime(timezone=True), server_default=text("NOW()"))
-    updated_at = Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()"))
+    updated_at = Column(
+        DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()")
+    )
     is_active = Column(Boolean, default=True, index=True)
 
-    embeddings = relationship("EmbeddingModel", back_populates="property", cascade="all, delete-orphan")
+    embeddings = relationship(
+        "EmbeddingModel", back_populates="property", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         Index("idx_properties_location", "city", "state"),
@@ -47,7 +62,11 @@ class EmbeddingModel(Base):
     __tablename__ = "embeddings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    property_id = Column(UUID(as_uuid=True), ForeignKey("properties.id", ondelete="CASCADE"), nullable=False)
+    property_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("properties.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     content = Column(Text, nullable=False)
     embedding = Column(Vector(1536), nullable=False)
     chunk_index = Column(Integer, default=0)
@@ -55,9 +74,7 @@ class EmbeddingModel(Base):
 
     property = relationship("PropertyModel", back_populates="embeddings")
 
-    __table_args__ = (
-        Index("idx_embeddings_property_id", "property_id"),
-    )
+    __table_args__ = (Index("idx_embeddings_property_id", "property_id"),)
 
 
 class UserSessionModel(Base):
@@ -68,9 +85,9 @@ class UserSessionModel(Base):
     messages = Column(JSON, default=[])
     context = Column(JSON, default={})
     created_at = Column(DateTime(timezone=True), server_default=text("NOW()"))
-    updated_at = Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()"))
+    updated_at = Column(
+        DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()")
+    )
     expires_at = Column(DateTime(timezone=True), nullable=True, index=True)
 
-    __table_args__ = (
-        Index("idx_user_sessions_updated_at", "updated_at"),
-    )
+    __table_args__ = (Index("idx_user_sessions_updated_at", "updated_at"),)

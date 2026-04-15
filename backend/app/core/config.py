@@ -45,7 +45,9 @@ class Settings(BaseSettings):
     RERANK_TOP_K: int = 3
 
     # CORS
-    ALLOWED_ORIGINS: List[str] = Field(default_factory=lambda: ["http://localhost:3000", "http://localhost:5173"])
+    ALLOWED_ORIGINS: List[str] = Field(
+        default_factory=lambda: ["http://localhost:3000", "http://localhost:5173"]
+    )
 
     # Logging
     LOG_LEVEL: str = "INFO"

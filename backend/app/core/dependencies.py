@@ -14,24 +14,38 @@ from app.infrastructure.llm.embeddings import EmbeddingGenerator
 from app.infrastructure.llm.openai_client import OpenAIClient
 from app.infrastructure.cache.redis_cache import RedisCache
 from app.infrastructure.agents.graph import MultiAgentGraph
-from app.application.services.rag_service import RAGIngestionService, RAGRetrievalService, ChunkingStrategy
+from app.application.services.rag_service import (
+    RAGIngestionService,
+    RAGRetrievalService,
+    ChunkingStrategy,
+)
 from app.application.services.agent_service import AgentService
 from app.application.services.recommend_use_case import RecommendUseCase
-from app.domain.repositories import PropertyRepository, EmbeddingRepository, UserSessionRepository
+from app.domain.repositories import (
+    PropertyRepository,
+    EmbeddingRepository,
+    UserSessionRepository,
+)
 from app.core.config import get_settings
 
 settings = get_settings()
 
 
-async def get_property_repository(session: AsyncSession = Depends(get_db)) -> PropertyRepository:
+async def get_property_repository(
+    session: AsyncSession = Depends(get_db),
+) -> PropertyRepository:
     return PropertyRepositoryImpl(session)
 
 
-async def get_embedding_repository(session: AsyncSession = Depends(get_db)) -> EmbeddingRepository:
+async def get_embedding_repository(
+    session: AsyncSession = Depends(get_db),
+) -> EmbeddingRepository:
     return EmbeddingRepositoryImpl(session)
 
 
-async def get_user_session_repository(session: AsyncSession = Depends(get_db)) -> UserSessionRepository:
+async def get_user_session_repository(
+    session: AsyncSession = Depends(get_db),
+) -> UserSessionRepository:
     return UserSessionRepositoryImpl(session)
 
 
@@ -45,12 +59,16 @@ def get_redis_cache() -> RedisCache:
 
 
 @lru_cache()
-def get_embedding_generator(cache: Optional[RedisCache] = Depends(get_redis_cache)) -> EmbeddingGenerator:
+def get_embedding_generator(
+    cache: Optional[RedisCache] = Depends(get_redis_cache),
+) -> EmbeddingGenerator:
     return EmbeddingGenerator(cache=cache)
 
 
 @lru_cache()
-def get_openai_client(cache: Optional[RedisCache] = Depends(get_redis_cache)) -> OpenAIClient:
+def get_openai_client(
+    cache: Optional[RedisCache] = Depends(get_redis_cache),
+) -> OpenAIClient:
     return OpenAIClient(cache=cache)
 
 

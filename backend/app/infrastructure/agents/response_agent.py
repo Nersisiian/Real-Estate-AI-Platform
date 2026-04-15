@@ -23,9 +23,13 @@ class ResponseAgent:
             return response
         except Exception as e:
             logger.error(f"Response generation error: {e}")
-            return "I'm having trouble formulating a response right now. Please try again."
+            return (
+                "I'm having trouble formulating a response right now. Please try again."
+            )
 
-    def _build_system_prompt(self, context: List[Dict], tool_results: List[Dict]) -> str:
+    def _build_system_prompt(
+        self, context: List[Dict], tool_results: List[Dict]
+    ) -> str:
         prompt = """You are a knowledgeable real estate assistant. Provide helpful, accurate responses based on the information given.
 
 Guidelines:

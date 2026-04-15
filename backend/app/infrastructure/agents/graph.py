@@ -49,7 +49,9 @@ class MultiAgentGraph:
         self.cache = cache
 
         self.planner = PlannerAgent(openai_client)
-        self.retrieval = RetrievalAgent(vector_store, embedding_generator, property_repo)
+        self.retrieval = RetrievalAgent(
+            vector_store, embedding_generator, property_repo
+        )
         self.tool_agent = ToolAgent(property_repo, openai_client)
         self.response_agent = ResponseAgent(openai_client)
 
@@ -74,7 +76,7 @@ class MultiAgentGraph:
             {
                 "tools": "tool_executor",
                 "respond": "response_generator",
-            }
+            },
         )
         workflow.add_edge("tool_executor", "response_generator")
         workflow.add_edge("response_generator", END)
@@ -122,24 +124,34 @@ class MultiAgentGraph:
             response = await self.response_agent.generate(state)
             if self.session_repo and state.get("session_id"):
                 session_id = UUID(state["session_id"])
-                messages = state["messages"] + [{"role": "assistant", "content": response}]
+                messages = state["messages"] + [
+                    {"role": "assistant", "content": response}
+                ]
                 await self.session_repo.update_messages(session_id, messages)
             return {"final_response": response}
         except Exception as e:
             logger.error(f"Response error: {e}")
-            return {"error": str(e), "final_response": "I'm sorry, I encountered an error."}
+            return {
+                "error": str(e),
+                "final_response": "I'm sorry, I encountered an error.",
+            }
 
     def _should_use_tools(self, state: AgentState) -> str:
         plan = state.get("plan", {})
         if plan.get("tools"):
             return "tools"
         last_msg = state["messages"][-1]["content"].lower()
-        if any(word in last_msg for word in ["mortgage", "calculate", "compare", "payment"]):
+        if any(
+            word in last_msg for word in ["mortgage", "calculate", "compare", "payment"]
+        ):
             return "tools"
         return "respond"
 
-    async def invoke(self, messages: List[Dict[str, str]], session_id: Optional[str] = None) -> Dict[str, Any]:
+    async def invoke(
+        self, messages: List[Dict[str, str]], session_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         import uuid
+
         initial_state: AgentState = {
             "messages": messages,
             "session_id": session_id or str(uuid.uuid4()),
@@ -155,7 +167,10 @@ class MultiAgentGraph:
             existing_session = await self.session_repo.get(UUID(session_id))
             if existing_session:
                 existing_messages = existing_session.messages
-                if existing_messages and messages[-1]["content"] == existing_messages[-1]["content"]:
+                if (
+                    existing_messages
+                    and messages[-1]["content"] == existing_messages[-1]["content"]
+                ):
                     initial_state["messages"] = existing_messages
                 else:
                     initial_state["messages"] = existing_messages + messages
@@ -164,8 +179,11 @@ class MultiAgentGraph:
         final_state = await self.graph.ainvoke(initial_state, config)
         return final_state
 
-    async def stream(self, messages: List[Dict[str, str]], session_id: Optional[str] = None) -> AsyncGenerator[Dict[str, Any], None]:
+    async def stream(
+        self, messages: List[Dict[str, str]], session_id: Optional[str] = None
+    ) -> AsyncGenerator[Dict[str, Any], None]:
         import uuid
+
         initial_state: AgentState = {
             "messages": messages,
             "session_id": session_id or str(uuid.uuid4()),

@@ -82,7 +82,13 @@ class Embedding:
     created_at: datetime = field(default_factory=datetime.utcnow)
 
     @classmethod
-    def create(cls, property_id: UUID, content: str, embedding: List[float], chunk_index: int = 0) -> "Embedding":
+    def create(
+        cls,
+        property_id: UUID,
+        content: str,
+        embedding: List[float],
+        chunk_index: int = 0,
+    ) -> "Embedding":
         return cls(
             id=uuid4(),
             property_id=property_id,

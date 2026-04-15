@@ -3,7 +3,10 @@ from decimal import Decimal
 from app.domain.entities import Property
 from app.application.services.rag_service import ChunkingStrategy
 from app.infrastructure.llm.embeddings import EmbeddingGenerator
-from app.infrastructure.db.repositories_impl import PropertyRepositoryImpl, EmbeddingRepositoryImpl
+from app.infrastructure.db.repositories_impl import (
+    PropertyRepositoryImpl,
+    EmbeddingRepositoryImpl,
+)
 from app.application.services.rag_service import RAGIngestionService
 
 

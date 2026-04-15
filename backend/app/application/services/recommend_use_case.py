@@ -68,7 +68,7 @@ class RecommendUseCase:
             query_embedding=query_embedding,
             top_k=limit * 2,
             min_score=0.6,
-            **{k: v for k, v in filters.items() if v is not None}
+            **{k: v for k, v in filters.items() if v is not None},
         )
 
         property_ids = list(set(r.property_id for r in results))

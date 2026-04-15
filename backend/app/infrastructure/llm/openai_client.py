@@ -77,7 +77,7 @@ class OpenAIClient:
                         "prompt_tokens": usage.prompt_tokens,
                         "completion_tokens": usage.completion_tokens,
                         "total_tokens": usage.total_tokens,
-                    }
+                    },
                 )
             return response
         except Exception as e:
@@ -88,7 +88,7 @@ class OpenAIClient:
                     "model": self.model,
                     "duration_ms": round(duration_ms, 2),
                     "error": str(e),
-                }
+                },
             )
             raise
 
@@ -112,7 +112,9 @@ class OpenAIClient:
         truncated_messages = self._truncate_messages(messages, max_tokens)
 
         try:
-            response = await self._call_openai(truncated_messages, temperature, max_tokens, stream=False)
+            response = await self._call_openai(
+                truncated_messages, temperature, max_tokens, stream=False
+            )
             content = response.choices[0].message.content
 
             if self.cache and use_cache and cache_key:
@@ -121,15 +123,21 @@ class OpenAIClient:
             return content
         except RateLimitError:
             logger.warning("Rate limit hit, falling back to fallback model")
-            return await self._fallback_chat(truncated_messages, temperature, max_tokens)
+            return await self._fallback_chat(
+                truncated_messages, temperature, max_tokens
+            )
         except APIError as e:
             if "context_length_exceeded" in str(e):
-                raise TokenLimitExceededError("Context length exceeded even after truncation")
+                raise TokenLimitExceededError(
+                    "Context length exceeded even after truncation"
+                )
             raise LLMError(f"OpenAI API error: {str(e)}")
         except Exception as e:
             raise LLMError(f"Unexpected error: {str(e)}")
 
-    async def _fallback_chat(self, messages: List[Dict], temperature: float, max_tokens: Optional[int]) -> str:
+    async def _fallback_chat(
+        self, messages: List[Dict], temperature: float, max_tokens: Optional[int]
+    ) -> str:
         try:
             response = await self.client.chat.completions.create(
                 model=self.fallback_model,
@@ -151,7 +159,9 @@ class OpenAIClient:
         truncated_messages = self._truncate_messages(messages, max_tokens)
 
         try:
-            stream = await self._call_openai(truncated_messages, temperature, max_tokens, stream=True)
+            stream = await self._call_openai(
+                truncated_messages, temperature, max_tokens, stream=True
+            )
             async for chunk in stream:
                 if chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
@@ -159,7 +169,9 @@ class OpenAIClient:
             logger.error(f"Streaming error: {e}")
             raise LLMError(f"Streaming failed: {str(e)}")
 
-    def _truncate_messages(self, messages: List[Dict], max_completion_tokens: Optional[int] = None) -> List[Dict]:
+    def _truncate_messages(
+        self, messages: List[Dict], max_completion_tokens: Optional[int] = None
+    ) -> List[Dict]:
         total_tokens = self.token_counter.count_messages_tokens(messages)
         reserved_for_completion = max_completion_tokens or 0
         available_tokens = self.max_context_tokens - reserved_for_completion
@@ -184,9 +196,12 @@ class OpenAIClient:
 
         return system_messages + truncated_other
 
-    def _generate_cache_key(self, messages: List[Dict], temperature: float, max_tokens: Optional[int]) -> str:
+    def _generate_cache_key(
+        self, messages: List[Dict], temperature: float, max_tokens: Optional[int]
+    ) -> str:
         import hashlib
         import json
+
         key_data = {
             "model": self.model,
             "messages": messages,

@@ -54,16 +54,18 @@ class RetrievalAgent:
         for result in search_results:
             prop = prop_map.get(str(result.property_id))
             if prop:
-                context_items.append({
-                    "property_id": str(prop.id),
-                    "title": prop.title,
-                    "price": float(prop.price),
-                    "location": f"{prop.city}, {prop.state}",
-                    "rooms": prop.rooms,
-                    "area": prop.area,
-                    "content": result.content,
-                    "score": result.score,
-                })
+                context_items.append(
+                    {
+                        "property_id": str(prop.id),
+                        "title": prop.title,
+                        "price": float(prop.price),
+                        "location": f"{prop.city}, {prop.state}",
+                        "rooms": prop.rooms,
+                        "area": prop.area,
+                        "content": result.content,
+                        "score": result.score,
+                    }
+                )
 
         deduped = {}
         for item in context_items:

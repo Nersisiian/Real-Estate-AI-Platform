@@ -18,7 +18,10 @@ class InputGuardrail:
     @staticmethod
     def validate_input(content: str) -> Tuple[bool, Optional[str]]:
         if len(content) > MAX_INPUT_LENGTH:
-            return False, f"Input exceeds maximum length of {MAX_INPUT_LENGTH} characters."
+            return (
+                False,
+                f"Input exceeds maximum length of {MAX_INPUT_LENGTH} characters.",
+            )
 
         lower_content = content.lower()
         for pattern in FORBIDDEN_PATTERNS:

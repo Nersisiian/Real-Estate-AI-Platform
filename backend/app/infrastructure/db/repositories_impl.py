@@ -7,7 +7,11 @@ from sqlalchemy import select, delete, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
-from app.domain.repositories import PropertyRepository, EmbeddingRepository, UserSessionRepository
+from app.domain.repositories import (
+    PropertyRepository,
+    EmbeddingRepository,
+    UserSessionRepository,
+)
 from app.domain.entities import Property, Embedding, UserSession
 from app.infrastructure.db.models import PropertyModel, EmbeddingModel, UserSessionModel
 
@@ -26,29 +30,33 @@ class PropertyRepositoryImpl(PropertyRepository):
 
     async def save(self, property: Property) -> Property:
         model = self._to_model(property)
-        stmt = insert(PropertyModel).values(**model).on_conflict_do_update(
-            index_elements=[PropertyModel.id],
-            set_={
-                "title": model["title"],
-                "description": model["description"],
-                "price": model["price"],
-                "area": model["area"],
-                "rooms": model["rooms"],
-                "bathrooms": model["bathrooms"],
-                "location": model["location"],
-                "city": model["city"],
-                "state": model["state"],
-                "zip_code": model["zip_code"],
-                "latitude": model["latitude"],
-                "longitude": model["longitude"],
-                "property_type": model["property_type"],
-                "year_built": model["year_built"],
-                "amenities": model["amenities"],
-                "images": model["images"],
-                "metadata": model["metadata"],
-                "updated_at": model["updated_at"],
-                "is_active": model["is_active"],
-            }
+        stmt = (
+            insert(PropertyModel)
+            .values(**model)
+            .on_conflict_do_update(
+                index_elements=[PropertyModel.id],
+                set_={
+                    "title": model["title"],
+                    "description": model["description"],
+                    "price": model["price"],
+                    "area": model["area"],
+                    "rooms": model["rooms"],
+                    "bathrooms": model["bathrooms"],
+                    "location": model["location"],
+                    "city": model["city"],
+                    "state": model["state"],
+                    "zip_code": model["zip_code"],
+                    "latitude": model["latitude"],
+                    "longitude": model["longitude"],
+                    "property_type": model["property_type"],
+                    "year_built": model["year_built"],
+                    "amenities": model["amenities"],
+                    "images": model["images"],
+                    "metadata": model["metadata"],
+                    "updated_at": model["updated_at"],
+                    "is_active": model["is_active"],
+                },
+            )
         )
         await self.session.execute(stmt)
         await self.session.commit()
@@ -86,7 +94,9 @@ class PropertyRepositoryImpl(PropertyRepository):
         if property_type:
             query = query.where(PropertyModel.property_type == property_type)
 
-        query = query.limit(limit).offset(offset).order_by(PropertyModel.created_at.desc())
+        query = (
+            query.limit(limit).offset(offset).order_by(PropertyModel.created_at.desc())
+        )
         result = await self.session.execute(query)
         models = result.scalars().all()
         return [self._to_entity(m) for m in models]
@@ -158,13 +168,17 @@ class EmbeddingRepositoryImpl(EmbeddingRepository):
 
     async def save(self, embedding: Embedding) -> Embedding:
         model = self._to_model(embedding)
-        stmt = insert(EmbeddingModel).values(**model).on_conflict_do_update(
-            index_elements=[EmbeddingModel.id],
-            set_={
-                "content": model["content"],
-                "embedding": model["embedding"],
-                "chunk_index": model["chunk_index"],
-            }
+        stmt = (
+            insert(EmbeddingModel)
+            .values(**model)
+            .on_conflict_do_update(
+                index_elements=[EmbeddingModel.id],
+                set_={
+                    "content": model["content"],
+                    "embedding": model["embedding"],
+                    "chunk_index": model["chunk_index"],
+                },
+            )
         )
         await self.session.execute(stmt)
         await self.session.commit()
@@ -180,7 +194,11 @@ class EmbeddingRepositoryImpl(EmbeddingRepository):
         return embeddings
 
     async def find_by_property_id(self, property_id: UUID) -> List[Embedding]:
-        stmt = select(EmbeddingModel).where(EmbeddingModel.property_id == property_id).order_by(EmbeddingModel.chunk_index)
+        stmt = (
+            select(EmbeddingModel)
+            .where(EmbeddingModel.property_id == property_id)
+            .order_by(EmbeddingModel.chunk_index)
+        )
         result = await self.session.execute(stmt)
         models = result.scalars().all()
         return [self._to_entity(m) for m in models]
@@ -201,10 +219,7 @@ class EmbeddingRepositoryImpl(EmbeddingRepository):
         distance_expr = EmbeddingModel.embedding.cosine_distance(query_embedding)
         score_expr = 1.0 - distance_expr
 
-        query = select(
-            EmbeddingModel,
-            score_expr.label("score")
-        ).where(
+        query = select(EmbeddingModel, score_expr.label("score")).where(
             distance_expr <= (1.0 - min_score)
         )
 
@@ -224,7 +239,11 @@ class EmbeddingRepositoryImpl(EmbeddingRepository):
             id=model.id,
             property_id=model.property_id,
             content=model.content,
-            embedding=model.embedding.tolist() if hasattr(model.embedding, 'tolist') else model.embedding,
+            embedding=(
+                model.embedding.tolist()
+                if hasattr(model.embedding, "tolist")
+                else model.embedding
+            ),
             chunk_index=model.chunk_index,
             created_at=model.created_at,
         )
@@ -253,15 +272,19 @@ class UserSessionRepositoryImpl(UserSessionRepository):
 
     async def save(self, session: UserSession) -> UserSession:
         model = self._to_model(session)
-        stmt = insert(UserSessionModel).values(**model).on_conflict_do_update(
-            index_elements=[UserSessionModel.id],
-            set_={
-                "user_id": model["user_id"],
-                "messages": model["messages"],
-                "context": model["context"],
-                "updated_at": model["updated_at"],
-                "expires_at": model["expires_at"],
-            }
+        stmt = (
+            insert(UserSessionModel)
+            .values(**model)
+            .on_conflict_do_update(
+                index_elements=[UserSessionModel.id],
+                set_={
+                    "user_id": model["user_id"],
+                    "messages": model["messages"],
+                    "context": model["context"],
+                    "updated_at": model["updated_at"],
+                    "expires_at": model["expires_at"],
+                },
+            )
         )
         await self.session.execute(stmt)
         await self.session.commit()
@@ -273,8 +296,11 @@ class UserSessionRepositoryImpl(UserSessionRepository):
         await self.session.commit()
         return result.rowcount > 0
 
-    async def update_messages(self, id: UUID, messages: List[Dict[str, Any]]) -> Optional[UserSession]:
+    async def update_messages(
+        self, id: UUID, messages: List[Dict[str, Any]]
+    ) -> Optional[UserSession]:
         from datetime import datetime
+
         stmt = (
             update(UserSessionModel)
             .where(UserSessionModel.id == id)

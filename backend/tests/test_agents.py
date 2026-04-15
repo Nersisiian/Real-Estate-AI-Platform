@@ -1,10 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
 from app.infrastructure.agents.planner_agent import PlannerAgent
 from app.infrastructure.agents.tool_agent import ToolAgent
 
 
-@pytest.mark.asyncio
 async def test_planner_agent():
     mock_llm = AsyncMock()
     mock_llm.chat_completion.return_value = (
@@ -15,7 +14,6 @@ async def test_planner_agent():
     assert plan["search_query"] == "test"
 
 
-@pytest.mark.asyncio
 async def test_tool_agent_calculate_mortgage():
     agent = ToolAgent(property_repo=MagicMock())
     state = {

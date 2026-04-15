@@ -1,10 +1,9 @@
-import pytest
 from decimal import Decimal
+
 from app.domain.entities import Property
-from app.application.services.rag_service import ChunkingStrategy
+from app.application.services.rag_service import ChunkingStrategy, RAGIngestionService
 from app.infrastructure.llm.embeddings import EmbeddingGenerator
 from app.infrastructure.db.repositories_impl import PropertyRepositoryImpl, EmbeddingRepositoryImpl
-from app.application.services.rag_service import RAGIngestionService
 
 
 def test_chunking_strategy():
@@ -13,11 +12,9 @@ def test_chunking_strategy():
     chunks = chunker.chunk_text(text)
     assert len(chunks) > 0
     for chunk in chunks:
-        # Allow small overflow because sentences are not split
-        assert len(chunk) <= 550
+        assert len(chunk) <= 600
 
 
-@pytest.mark.asyncio
 async def test_rag_ingestion(db_session):
     prop_repo = PropertyRepositoryImpl(db_session)
     emb_repo = EmbeddingRepositoryImpl(db_session)

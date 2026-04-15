@@ -20,8 +20,9 @@ TEST_DATABASE_URL = settings.async_database_url.replace(
 engine_for_creation = create_async_engine(
     settings.async_database_url.replace(settings.POSTGRES_DB, "postgres"),
     echo=False,
-    isolation_level="AUTOCOMMIT"
+    isolation_level="AUTOCOMMIT",
 )
+
 
 async def create_test_db():
     async with engine_for_creation.connect() as conn:
@@ -29,10 +30,12 @@ async def create_test_db():
         await conn.execute(text(f"CREATE DATABASE {settings.POSTGRES_DB}_test"))
     await engine_for_creation.dispose()
 
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_db():
     asyncio.run(create_test_db())
     yield
+
 
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
@@ -69,7 +72,9 @@ async def client(db_session: AsyncSession):
     app.dependency_overrides[get_redis_cache] = override_get_cache
     app.dependency_overrides[get_embedding_generator] = override_get_embedding_generator
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         yield ac
 
     app.dependency_overrides.clear()

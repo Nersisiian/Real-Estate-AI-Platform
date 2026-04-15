@@ -7,7 +7,11 @@ from sqlalchemy import select, delete, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
-from app.domain.repositories import PropertyRepository, EmbeddingRepository, UserSessionRepository
+from app.domain.repositories import (
+    PropertyRepository,
+    EmbeddingRepository,
+    UserSessionRepository,
+)
 from app.domain.entities import Property, Embedding, UserSession
 from app.infrastructure.db.models import PropertyModel, EmbeddingModel, UserSessionModel
 
@@ -235,9 +239,11 @@ class EmbeddingRepositoryImpl(EmbeddingRepository):
             id=model.id,
             property_id=model.property_id,
             content=model.content,
-            embedding=model.embedding.tolist()
-            if hasattr(model.embedding, "tolist")
-            else model.embedding,
+            embedding=(
+                model.embedding.tolist()
+                if hasattr(model.embedding, "tolist")
+                else model.embedding
+            ),
             chunk_index=model.chunk_index,
             created_at=model.created_at,
         )
